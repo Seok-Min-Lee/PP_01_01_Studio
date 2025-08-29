@@ -10,7 +10,7 @@ public class Ctrl_SelectBase : MonoBehaviour
     private int timeLimit;
     protected virtual void Start()
     {
-        timeLimit = StaticValues.TIME_LIMIT_DEFAULT;
+        timeLimit = ConstantValues.TIME_LIMIT_DEFAULT;
     }
     protected virtual void Update()
     {

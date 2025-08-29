@@ -13,7 +13,7 @@ public class Ctrl_Result : MonoBehaviour
     private int timeLimit;
     private void Start()
     {
-        timeLimit = StaticValues.TIME_LIMIT_DEFAULT;
+        timeLimit = ConstantValues.TIME_LIMIT_DEFAULT;
         CreatePassword();
     }
     private void Update()

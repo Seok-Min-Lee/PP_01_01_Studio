@@ -4,5 +4,6 @@ using UnityEngine;
 
 public static class StaticValues
 {
-    public const int TIME_LIMIT_DEFAULT = 20;
+    public static int password;
+    public static byte[] textureBytes;
 }

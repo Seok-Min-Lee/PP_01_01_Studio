@@ -41,9 +41,7 @@ public class Client : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.A))
         {
-            string str = "Message from Client";
-            byte[] bytes = Encoding.UTF8.GetBytes(str);
-            client.Send(bytes);
+            RequestPassword();
         }
     }
 
@@ -56,19 +54,55 @@ public class Client : MonoBehaviour
     }
     public void ReceiveMessage(ArraySegment<byte> message)
     {
-        string sMessage = Encoding.UTF8.GetString(message);
-        Debug.Log(sMessage);
+        // clear previous message
+        byte[] messageBytes = new byte[message.Count];
+        for (int i = 0; i < messageBytes.Length; i++)
+        {
+            messageBytes[i] = message.Array[i];
+        }
 
-        //// clear previous message
-        //byte[] messageBytes = new byte[message.Count];
-        //for (int i = 0; i < messageBytes.Length; i++)
-        //{
-        //    messageBytes[i] = message.Array[i];
-        //}
+        byte[] commandBytes = new byte[4];
+        Array.Copy(messageBytes, 0, commandBytes, 0, 4);
+        int command = BitConverter.ToInt32(commandBytes);
 
+        switch (command)
+        {
+            case ConstantValues.CMD_RESPONSE_PASSWORD:
+                ReceivePassword(message: ref messageBytes);
+                break;
+            default:
+                break;
+        }
+    }
 
-        //byte[] commandBytes = new byte[4];
-        //Array.Copy(messageBytes, 0, commandBytes, 0, 4);
-        //int command = BitConverter.ToInt32(commandBytes);
+    public void RequestPassword()
+    {
+        byte[] message = BitConverter.GetBytes(ConstantValues.CMD_REQUEST_PASSWORD);
+        client.Send(message);
+
+        Debug.Log("RequestPassword");
+    }
+    public void ReceivePassword(ref byte[] message)
+    {
+        byte[] passwordBytes = new byte[4];
+        Array.Copy(message, 4, passwordBytes, 0, 4);
+
+        StaticValues.password = BitConverter.ToInt32(passwordBytes);
+
+        Debug.Log("ReceivePassword::" + StaticValues.password);
+
+        SendStudioData();
+    }
+    public void SendStudioData()
+    {
+        List<byte> messages = new List<byte>();
+        messages.AddRange(BitConverter.GetBytes(ConstantValues.CMD_SEND_STUDIO_DATA));
+        messages.AddRange(BitConverter.GetBytes(StaticValues.password));
+        messages.AddRange(BitConverter.GetBytes(StaticValues.textureBytes.Length));
+        messages.AddRange(StaticValues.textureBytes);
+
+        client.Send(messages.ToArray());
+
+        Debug.Log("SendStudioData");
     }
 }
