@@ -3,19 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Ctrl_SelectBase : MonoBehaviour
+public class Ctrl_Error : MonoBehaviour
 {
-    public static Ctrl_SelectBase instance;
-
     [SerializeField] private Image timebarGuage;
+
     private float timer = 0f;
     private int timeLimit;
-    protected virtual void Start()
+    private void Start()
     {
-        instance = this;
         timeLimit = ConstantValues.TIME_LIMIT_DEFAULT;
     }
-    protected virtual void Update()
+    private void Update()
     {
         if (Input.anyKey)
         {
@@ -33,13 +31,5 @@ public class Ctrl_SelectBase : MonoBehaviour
     public void OnClickHome()
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene("01_Title");
-    }
-    public void LoadNext()
-    {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("03_Result");
-    }
-    public void LoadError()
-    {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("03_Error");
     }
 }

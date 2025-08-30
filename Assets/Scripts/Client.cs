@@ -68,6 +68,9 @@ public class Client : MonoSingleton<Client>
             case ConstantValues.CMD_RESPONSE_PASSWORD:
                 ReceivePassword(message: ref messageBytes);
                 break;
+            case ConstantValues.CMD_RESPONSE_ADD_STUDIO_DATA_RESULT:
+                ReceiveResult(message: ref messageBytes);
+                break;
             default:
                 break;
         }
@@ -94,7 +97,7 @@ public class Client : MonoSingleton<Client>
     public void SendStudioData()
     {
         List<byte> messages = new List<byte>();
-        messages.AddRange(BitConverter.GetBytes(ConstantValues.CMD_SEND_STUDIO_DATA));
+        messages.AddRange(BitConverter.GetBytes(ConstantValues.CMD_REQUEST_ADD_STUDIO_DATA));
         messages.AddRange(BitConverter.GetBytes(StaticValues.password));
         messages.AddRange(BitConverter.GetBytes(StaticValues.textureBytes.Length));
         messages.AddRange(StaticValues.textureBytes);
@@ -102,5 +105,21 @@ public class Client : MonoSingleton<Client>
         client.Send(messages.ToArray());
 
         Debug.Log("SendStudioData");
+    }
+    public void ReceiveResult(ref byte[] message)
+    {
+        byte[] bResult = new byte[1];
+        Array.Copy(message, 4, bResult, 0, 1);
+
+        bool result = BitConverter.ToBoolean(bResult);
+
+        if (result)
+        {
+            Ctrl_SelectBase.instance.LoadNext();
+        }
+        else
+        {
+            Ctrl_SelectBase.instance.LoadError();
+        }
     }
 }

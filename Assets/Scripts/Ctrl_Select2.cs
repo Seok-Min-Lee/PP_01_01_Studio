@@ -51,6 +51,5 @@ public class Ctrl_Select2 : Ctrl_SelectBase
 
         StaticValues.textureBytes = textures[currentNum].EncodeToJPG();
         Client.Instance.RequestPassword();
-        //UnityEngine.SceneManagement.SceneManager.LoadScene("03_Result");
     }
 }
