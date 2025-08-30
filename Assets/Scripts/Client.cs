@@ -4,15 +4,13 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-public class Client : MonoBehaviour
+public class Client : MonoSingleton<Client>
 {
     public Telepathy.Client client = new Telepathy.Client(1920 * 1080 + 1024);
 
 
     private void Awake()
     {
-        DontDestroyOnLoad(gameObject);
-
         // update even if window isn't focused, otherwise we don't receive.
         Application.runInBackground = true;
 

@@ -21,6 +21,8 @@ public class Ctrl_Select2 : Ctrl_SelectBase
 
             thumbnails[i].Init(id: i, sprite: sprite, ctrl: this);
         }
+
+        Debug.Log("Client is Available? " + (Client.Instance != null));
     }
     protected override void Update()
     {
@@ -48,7 +50,7 @@ public class Ctrl_Select2 : Ctrl_SelectBase
         }
 
         StaticValues.textureBytes = textures[currentNum].EncodeToJPG();
-        GameObject.Find("Client").GetComponent<Client>().RequestPassword();
+        Client.Instance.RequestPassword();
         //UnityEngine.SceneManagement.SceneManager.LoadScene("03_Result");
     }
 }
