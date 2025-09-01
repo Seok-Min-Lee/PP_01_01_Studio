@@ -65,7 +65,7 @@ public class Client : MonoSingleton<Client>
 
         switch (command)
         {
-            case ConstantValues.CMD_RESPONSE_PASSWORD:
+            case ConstantValues.CMD_RESPONSE_GET_PASSWORD:
                 ReceivePassword(message: ref messageBytes);
                 break;
             case ConstantValues.CMD_RESPONSE_ADD_STUDIO_DATA_RESULT:
@@ -78,7 +78,7 @@ public class Client : MonoSingleton<Client>
 
     public void RequestPassword()
     {
-        byte[] message = BitConverter.GetBytes(ConstantValues.CMD_REQUEST_PASSWORD);
+        byte[] message = BitConverter.GetBytes(ConstantValues.CMD_REQUEST_GET_PASSWORD);
         client.Send(message);
 
         Debug.Log("RequestPassword");
