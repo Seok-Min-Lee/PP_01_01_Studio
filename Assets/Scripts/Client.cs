@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using UnityEngine;
 
@@ -39,7 +40,7 @@ public class Client : MonoSingleton<Client>
 
         if (Input.GetKeyDown(KeyCode.A))
         {
-            RequestPassword();
+            RequestGetPassword();
         }
     }
 
@@ -60,13 +61,13 @@ public class Client : MonoSingleton<Client>
         }
 
         byte[] commandBytes = new byte[4];
-        Array.Copy(messageBytes, 0, commandBytes, 0, 4);
+        Buffer.BlockCopy(messageBytes, 0, commandBytes, 0, 4);
         int command = BitConverter.ToInt32(commandBytes);
 
         switch (command)
         {
             case ConstantValues.CMD_RESPONSE_GET_PASSWORD:
-                ReceivePassword(message: ref messageBytes);
+                ReceiveGetPassword(message: ref messageBytes);
                 break;
             case ConstantValues.CMD_RESPONSE_ADD_STUDIO_DATA_RESULT:
                 ReceiveResult(message: ref messageBytes);
@@ -76,42 +77,48 @@ public class Client : MonoSingleton<Client>
         }
     }
 
-    public void RequestPassword()
+    public void RequestGetPassword()
     {
         byte[] message = BitConverter.GetBytes(ConstantValues.CMD_REQUEST_GET_PASSWORD);
         client.Send(message);
 
-        Debug.Log("RequestPassword");
+        Debug.Log($"Request Get Password");
     }
-    public void ReceivePassword(ref byte[] message)
+    public void ReceiveGetPassword(ref byte[] message)
     {
         byte[] passwordBytes = new byte[4];
-        Array.Copy(message, 4, passwordBytes, 0, 4);
+        Buffer.BlockCopy(message, 4, passwordBytes, 0, 4);
 
-        StaticValues.password = BitConverter.ToInt32(passwordBytes);
+        int password = BitConverter.ToInt32(passwordBytes);
+        StaticValues.password = password;
 
-        Debug.Log("ReceivePassword::" + StaticValues.password);
+        Debug.Log($"Receive Get Password::{password}");
 
-        SendStudioData();
+        RequestAddStudioData();
     }
-    public void SendStudioData()
+    public void RequestAddStudioData()
     {
-        List<byte> messages = new List<byte>();
-        messages.AddRange(BitConverter.GetBytes(ConstantValues.CMD_REQUEST_ADD_STUDIO_DATA));
-        messages.AddRange(BitConverter.GetBytes(StaticValues.password));
-        messages.AddRange(BitConverter.GetBytes(StaticValues.textureBytes.Length));
-        messages.AddRange(StaticValues.textureBytes);
+        using (MemoryStream ms = new MemoryStream())
+        using (BinaryWriter bw = new BinaryWriter(ms))
+        {
+            bw.Write(ConstantValues.CMD_REQUEST_ADD_STUDIO_DATA);
+            bw.Write(StaticValues.password);
+            bw.Write(StaticValues.textureBytes.Length);
+            bw.Write(StaticValues.textureBytes);
 
-        client.Send(messages.ToArray());
+            client.Send(ms.ToArray());
+        }
 
-        Debug.Log("SendStudioData");
+        Debug.Log($"Request Add Studio Data::{StaticValues.password}");
     }
     public void ReceiveResult(ref byte[] message)
     {
         byte[] bResult = new byte[1];
-        Array.Copy(message, 4, bResult, 0, 1);
+        Buffer.BlockCopy(message, 4, bResult, 0, 1);
 
         bool result = BitConverter.ToBoolean(bResult);
+
+        Debug.Log($"Receive Add Studio Data Result::{result}");
 
         if (result)
         {
