@@ -14,7 +14,7 @@ public class Ctrl_Result : MonoBehaviour
     private void Start()
     {
         timeLimit = ConstantValues.TIME_LIMIT_DEFAULT;
-        CreatePassword();
+        DisplayPassword(StaticValues.password);
     }
     private void Update()
     {
@@ -35,10 +35,8 @@ public class Ctrl_Result : MonoBehaviour
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene("01_Title");
     }
-    private void CreatePassword()
+    private void DisplayPassword(int password)
     {
-        int password = Random.Range(0, 10000);
-
         string numberString = password.ToString("D4");
 
         for (int i = 0; i < digits.Length; i++)
