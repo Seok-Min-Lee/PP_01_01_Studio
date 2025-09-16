@@ -6,6 +6,8 @@ public class Ctrl_Init : MonoBehaviour
 {
     private void Start()
     {
+        Debug.Log("Client is Available? " + (Client.Instance != null));
+
         UnityEngine.SceneManagement.SceneManager.LoadScene("01_Title");
     }
 }
