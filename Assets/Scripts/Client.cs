@@ -21,7 +21,7 @@ public class Client : MonoSingleton<Client>
         Telepathy.Log.Error = Debug.LogError;
 
         // hook up events
-        client.OnConnected = () => Debug.Log("Client Connected");
+        client.OnConnected = () => OnConnected();
         client.OnData = (message) => ReceiveMessage(message);
         client.OnDisconnected = () => Debug.Log("Client Disconnected");
     }
@@ -51,6 +51,18 @@ public class Client : MonoSingleton<Client>
         // again later. this is fine, but let's shut them down here for consistency
         client.Disconnect();
     }
+    private void OnConnected()
+    {
+        Debug.Log("Client Connected");
+
+        using (MemoryStream ms = new MemoryStream())
+        using (BinaryWriter bw = new BinaryWriter(ms))
+        {
+            bw.Write(ConstantValues.CMD_REQUEST_CONNECT_STUDIO);
+
+            client.Send(ms.ToArray());
+        }
+    }
     public void ReceiveMessage(ArraySegment<byte> message)
     {
         // clear previous message
@@ -66,6 +78,9 @@ public class Client : MonoSingleton<Client>
 
         switch (command)
         {
+            case ConstantValues.CMD_RESPONSE_CONNECT_RESULT:
+                ReceiveConnectResult(message: ref messageBytes);
+                break;
             case ConstantValues.CMD_RESPONSE_GET_PASSWORD:
                 ReceiveGetPassword(message: ref messageBytes);
                 break;
@@ -128,5 +143,14 @@ public class Client : MonoSingleton<Client>
         {
             Ctrl_SelectBase.instance.LoadError();
         }
+    }
+    public void ReceiveConnectResult(ref byte[] message)
+    {
+        byte[] resultBytes = new byte[1];
+        Buffer.BlockCopy(message, 4, resultBytes, 0, 1);
+
+        bool result = BitConverter.ToBoolean(resultBytes);
+
+        Debug.Log($"Receive Connect Result::{result}");
     }
 }
