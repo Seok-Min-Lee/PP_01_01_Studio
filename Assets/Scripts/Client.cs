@@ -9,7 +9,6 @@ public class Client : MonoSingleton<Client>
 {
     public Telepathy.Client client = new Telepathy.Client(1920 * 1080 + 1024);
 
-
     private void Awake()
     {
         // update even if window isn't focused, otherwise we don't receive.
@@ -37,11 +36,6 @@ public class Client : MonoSingleton<Client>
         {
             client.Connect("127.0.0.1", 45604);
         }
-
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            RequestGetPassword();
-        }
     }
 
     private void OnApplicationQuit()
@@ -63,7 +57,7 @@ public class Client : MonoSingleton<Client>
             client.Send(ms.ToArray());
         }
     }
-    public void ReceiveMessage(ArraySegment<byte> message)
+    private void ReceiveMessage(ArraySegment<byte> message)
     {
         // clear previous message
         byte[] messageBytes = new byte[message.Count];
@@ -85,7 +79,7 @@ public class Client : MonoSingleton<Client>
                 ReceiveGetPassword(message: ref messageBytes);
                 break;
             case ConstantValues.CMD_RESPONSE_ADD_STUDIO_DATA_RESULT:
-                ReceiveResult(message: ref messageBytes);
+                ReceiveAddStudioDataResult(message: ref messageBytes);
                 break;
             default:
                 break;
@@ -98,18 +92,6 @@ public class Client : MonoSingleton<Client>
         client.Send(message);
 
         Debug.Log($"Request Get Password");
-    }
-    public void ReceiveGetPassword(ref byte[] message)
-    {
-        byte[] passwordBytes = new byte[4];
-        Buffer.BlockCopy(message, 4, passwordBytes, 0, 4);
-
-        int password = BitConverter.ToInt32(passwordBytes);
-        StaticValues.password = password;
-
-        Debug.Log($"Receive Get Password::{password}");
-
-        RequestAddStudioData();
     }
     public void RequestAddStudioData()
     {
@@ -126,8 +108,21 @@ public class Client : MonoSingleton<Client>
 
         Debug.Log($"Request Add Studio Data::{StaticValues.password}");
     }
-    public void ReceiveResult(ref byte[] message)
+    private void ReceiveGetPassword(ref byte[] message)
     {
+        byte[] passwordBytes = new byte[4];
+        Buffer.BlockCopy(message, 4, passwordBytes, 0, 4);
+
+        int password = BitConverter.ToInt32(passwordBytes);
+        StaticValues.password = password;
+
+        Debug.Log($"Receive Get Password::{password}");
+
+        RequestAddStudioData();
+    }
+    private void ReceiveAddStudioDataResult(ref byte[] message)
+    {
+        // Receive Data
         byte[] bResult = new byte[1];
         Buffer.BlockCopy(message, 4, bResult, 0, 1);
 
@@ -135,6 +130,7 @@ public class Client : MonoSingleton<Client>
 
         Debug.Log($"Receive Add Studio Data Result::{result}");
 
+        // Load Scene
         if (result)
         {
             Ctrl_SelectBase.instance.LoadNext();
@@ -144,7 +140,7 @@ public class Client : MonoSingleton<Client>
             Ctrl_SelectBase.instance.LoadError();
         }
     }
-    public void ReceiveConnectResult(ref byte[] message)
+    private void ReceiveConnectResult(ref byte[] message)
     {
         byte[] resultBytes = new byte[1];
         Buffer.BlockCopy(message, 4, resultBytes, 0, 1);
