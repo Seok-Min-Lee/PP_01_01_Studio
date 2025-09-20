@@ -4,22 +4,32 @@ using UnityEngine;
 
 public class Ctrl_Select2 : Ctrl_SelectBase
 {
-    [SerializeField] private SampleThumbnail[] thumbnails;
-    [SerializeField] private Texture2D[] textures;
+    [SerializeField] private Transform sampleParent;
+    [SerializeField] private SampleThumbnail samplePrefab;
+    private List<SampleThumbnail> thumbnails = new List<SampleThumbnail>();
+
+    private List<Texture2D> sampleTextures = new List<Texture2D>();
     private int currentNum = -1;
     protected override void Start()
     {
         base.Start();
 
-        for (int i = 0; i < thumbnails.Length; i++)
+        sampleTextures = StaticValues.sampleTextures != null ? 
+            StaticValues.sampleTextures : 
+            StaticValues.sampleTextures = StaticValues.LoadSampleTextures($"{Application.streamingAssetsPath}/samples"); ;
+
+        for (int i = 0; i < sampleTextures.Count; i++)
         {
+            SampleThumbnail thumbnail = GameObject.Instantiate<SampleThumbnail>(samplePrefab, sampleParent);
+
             Sprite sprite = Sprite.Create(
-                texture: textures[i],
-                rect: new Rect(0, 0, textures[i].width, textures[i].height),
+                texture: sampleTextures[i],
+                rect: new Rect(0, 0, sampleTextures[i].width, sampleTextures[i].height),
                 pivot: new Vector2(0.5f, 0.5f)
             );
 
-            thumbnails[i].Init(id: i, sprite: sprite, ctrl: this);
+            thumbnail.Init(id: i, sprite: sprite, ctrl: this);
+            thumbnails.Add(thumbnail);
         }
 
         Debug.Log("Client is Available? " + (Client.Instance != null));
@@ -49,7 +59,7 @@ public class Ctrl_Select2 : Ctrl_SelectBase
             return;
         }
 
-        StaticValues.textureBytes = textures[currentNum].EncodeToJPG();
+        StaticValues.textureBytes = sampleTextures[currentNum].EncodeToJPG();
         Client.Instance.RequestGetPassword();
     }
 }
