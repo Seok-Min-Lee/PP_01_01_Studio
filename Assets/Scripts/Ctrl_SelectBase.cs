@@ -32,6 +32,7 @@ public class Ctrl_SelectBase : MonoBehaviour
     }
     public void OnClickHome()
     {
+        AudioManager.Instance.PlaySFX(Sound.Key.Click);
         UnityEngine.SceneManagement.SceneManager.LoadScene("01_Title");
     }
     public void LoadNext()

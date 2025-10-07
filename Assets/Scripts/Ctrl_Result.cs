@@ -28,11 +28,12 @@ public class Ctrl_Result : MonoBehaviour
 
         if (timer > timeLimit)
         {
-            OnClickHome();
+            UnityEngine.SceneManagement.SceneManager.LoadScene("01_Title");
         }
     }
     public void OnClickHome()
     {
+        AudioManager.Instance.PlaySFX(Sound.Key.Click);
         UnityEngine.SceneManagement.SceneManager.LoadScene("01_Title");
     }
     private void DisplayPassword(int password)

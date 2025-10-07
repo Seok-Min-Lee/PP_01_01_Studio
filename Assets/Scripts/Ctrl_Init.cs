@@ -10,6 +10,13 @@ public class Ctrl_Init : MonoBehaviour
 
         StaticValues.sampleTextures = StaticValues.LoadSampleTextures($"{Application.streamingAssetsPath}/samples");
 
+        AudioManager.Instance.Load(() =>
+        {
+            AudioManager.Instance.Init(volumeBGM: 1f, volumeSFX: 1f);
+        });
+
+        Debug.Log(TouchManager.Instance.Canvas == null);
+
         UnityEngine.SceneManagement.SceneManager.LoadScene("01_Title");
     }
 

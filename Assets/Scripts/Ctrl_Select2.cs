@@ -34,10 +34,6 @@ public class Ctrl_Select2 : Ctrl_SelectBase
 
         Debug.Log("Client is Available? " + (Client.Instance != null));
     }
-    //protected override void Update()
-    //{
-    //    base.Update();
-    //}
     public void SelectThumbnail(int num)
     {
         if (currentNum != num)
@@ -54,6 +50,8 @@ public class Ctrl_Select2 : Ctrl_SelectBase
     }
     public void OnClickNext()
     {
+        AudioManager.Instance.PlaySFX(Sound.Key.Click);
+
         if (currentNum == -1)
         {
             return;

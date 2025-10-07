@@ -24,6 +24,7 @@ public class SampleThumbnail : MonoBehaviour
 
     public void OnClick()
     {
+        AudioManager.Instance.PlaySFX(Sound.Key.Click);
         ctrl.SelectThumbnail(id);
     }
     public void Select()
